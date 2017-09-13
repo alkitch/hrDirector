@@ -54,4 +54,5 @@ private:
 	ID2D1SolidColorBrush* m_pCornflowerBlueBrush;
 	CJoystickDevice m_joystick;
 	bool m_bJoystickValid;
+	bool m_bIsGameRunning;
 };

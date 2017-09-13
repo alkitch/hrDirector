@@ -6,6 +6,9 @@
 #include "hrDirector.h"
 
 #define MAX_LOADSTRING 100
+const int TICKS_PER_SECOND = 70; // Update() rate per second
+const int SKIP_TICKS = 1000 / TICKS_PER_SECOND;
+const int MAX_FRAMESKIP = 10;
 
 HINSTANCE hInst;
 
@@ -17,6 +20,7 @@ hrDirectorApp::hrDirectorApp() :
 	m_pCornflowerBlueBrush(nullptr)
 {
 	m_bJoystickValid = false;
+	m_bIsGameRunning = false;
 }
 
 hrDirectorApp::~hrDirectorApp()
@@ -32,7 +36,7 @@ hrDirectorApp::~hrDirectorApp()
 void hrDirectorApp::RunMessageLoop()
 {	
 	HACCEL hAccelTable = LoadAccelerators(HINST_THISCOMPONENT, MAKEINTRESOURCE(IDC_HRDIRECTOR));
-
+MSG msg;
 #ifdef NORUNTIME
 	MSG msg;
 
@@ -46,12 +50,12 @@ void hrDirectorApp::RunMessageLoop()
 		}
 	}
 #else
-	MSG msg;
-
-	//int loops;
-	msg.message = WM_NULL;
+	
+	msg.message = 0;
+	int loops;
 	ULONGLONG next_game_tick = GetTickCount64();
-	while (msg.message != WM_QUIT)
+	m_bIsGameRunning = true;
+	while ( (msg.message) != WM_QUIT && m_bIsGameRunning == true )
 	{
 		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
 		{
@@ -63,26 +67,19 @@ void hrDirectorApp::RunMessageLoop()
 		}
 		else
 		{
-			/*
+			
 			loops = 0;
 			while (GetTickCount64() > next_game_tick && loops < MAX_FRAMESKIP)
 			{
-			//FSX_SIM_DATA simdata;
-			EnterCriticalSection(&g_pSim_Context.clientDataInterlock);
-			//memcpy_s(&simdata, sizeof(FSX_SIM_DATA), (FSX_SIM_DATA*)g_pSim_Context.dataSet, sizeof(FSX_SIM_DATA));
-			theInstrumentPanel->Update(g_pSim_Context.dataSet);
-			LeaveCriticalSection(&g_pSim_Context.clientDataInterlock);
-			//theInstrumentPanel->Update(&simdata);
-			next_game_tick += SKIP_TICKS;
-			loops++;
-			}*/
-
-			OnUpdate();
+				OnUpdate();
+				next_game_tick += SKIP_TICKS;
+				loops++;
+			}
 
 			OnRender();
 		}
 	}
-
+	m_bIsGameRunning = false;
 
 
 	//return ExitInstance((int)msg.wParam);
@@ -147,6 +144,12 @@ HRESULT hrDirectorApp::Initialize()
 		hr = m_hwnd ? S_OK : E_FAIL;
 		if (SUCCEEDED(hr))
 		{
+			m_bJoystickValid = false;
+			hr = m_joystick.InitDirectInput(m_hwnd);
+
+			if (hr == S_OK)
+				m_bJoystickValid = true;
+
 			ShowWindow(m_hwnd, SW_SHOWNORMAL);
 			UpdateWindow(m_hwnd);
 		}
@@ -371,13 +374,8 @@ HRESULT hrDirectorApp::CreateDeviceIndependentResources()
 
 HRESULT hrDirectorApp::CreateDeviceResources()
 {
-
-	m_bJoystickValid = false;
-	HRESULT hr =  m_joystick.InitDirectInput(m_hwnd);
-
-	if (hr == S_OK)
-		m_bJoystickValid = true;
-
+	HRESULT hr = S_OK;
+	
 	if (!m_pRenderTarget)
 	{
 		RECT rc;
@@ -446,11 +444,14 @@ HRESULT hrDirectorApp::OnUpdate()
 		if (hs == S_OK)
 		{
 			CString sz;
-			sz.Format(_T("%d\n"), js.lX);
+			sz.Format(_T("%d,%d\n"), js.lX, js.lY);
 			OutputDebugString(sz);
 
-			m_sizeA += (js.lX * 0.05f);
-			m_sizeB += (js.lY * 0.05f);
+			m_sizeA = 100 + (js.lX * 0.5f);
+			m_sizeB = 100 + (js.lY * 0.5f);
+		}
+		else {
+			OutputDebugString(L"Update Fail\n");
 		}
 	}
 
