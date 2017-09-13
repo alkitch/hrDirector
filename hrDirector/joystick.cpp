@@ -102,8 +102,8 @@ HRESULT CJoystickDevice::InitDirectInput(HWND hWnd)
 
 	// Set the cooperative level to let DInput know how this device should 
 	// interact with the system and with other DInput applications. 
-	if (FAILED(hr = g_pJoystick->SetCooperativeLevel(hWnd, DISCL_EXCLUSIVE |
-		DISCL_FOREGROUND)))
+	if (FAILED(hr = g_pJoystick->SetCooperativeLevel(hWnd, DISCL_NONEXCLUSIVE |
+		DISCL_BACKGROUND)))
 		return hr;
 
 	// Enumerate the joystick objects. The callback function enabled user 
@@ -112,6 +112,10 @@ HRESULT CJoystickDevice::InitDirectInput(HWND hWnd)
 	if (FAILED(hr = g_pJoystick->EnumObjects(EnumObjectsCallback,
 		(VOID*)hWnd, DIDFT_ALL)))
 		return hr;
+
+
+	if( g_pJoystick != nullptr)
+		g_pJoystick->Acquire();
 
 	return S_OK;
 }
@@ -127,6 +131,7 @@ HRESULT CJoystickDevice::UpdateInputState(DIJOYSTATE2& js)
 	hr = g_pJoystick->Poll();
 	if (FAILED(hr))
 	{
+		OutputDebugString(L"Poll Failed\n");
 		// DInput is telling us that the input stream has been 
 		// interrupted. We aren't tracking any state between polls, so 
 		// we don't have any special reset that needs to be done. We 
@@ -138,7 +143,7 @@ HRESULT CJoystickDevice::UpdateInputState(DIJOYSTATE2& js)
 		// hr may be DIERR_OTHERAPPHASPRIO or other errors.  This 
 		// may occur when the app is minimized or in the process of  
 		// switching, so just try again later  
-		return S_OK;
+		//return S_FALSE;
 	}
 
 	// Get the input's device state 

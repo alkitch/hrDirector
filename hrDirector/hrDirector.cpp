@@ -439,20 +439,31 @@ void hrDirectorApp::DiscardDeviceResources()
 
 HRESULT hrDirectorApp::OnUpdate()
 {
+	DIJOYSTATE2 js = { 0 };
 	if (m_bJoystickValid == true)
 	{
-		DIJOYSTATE2 js;
-		m_joystick.UpdateInputState(js);
+		HRESULT hs = m_joystick.UpdateInputState(js);
+		if (hs == S_OK)
+		{
+			CString sz;
+			sz.Format(_T("%d\n"), js.lX);
+			OutputDebugString(sz);
+
+			m_sizeA += (js.lX * 0.05f);
+			m_sizeB += (js.lY * 0.05f);
+		}
 	}
 
 	HRESULT hr = S_OK;
-	m_sizeA += 0.1f;
+	
+	/*m_sizeA += 0.1f;
 	m_sizeB += 0.2f;
 	if (m_sizeA > 50)
 	{
 		m_sizeA = 1.0f;
 		m_sizeB = 1.0f;
 	}
+	*/
 
 	return hr;
 }
