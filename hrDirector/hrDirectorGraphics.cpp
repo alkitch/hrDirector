@@ -2,8 +2,9 @@
 #include "joystick.h"
 #include "hrDirector.h"
 
-HRESULT hrDirectorApp::CreateResources(ID2D1HwndRenderTarget* pRenderTarget)
+HRESULT hrDirectorApp::CreateResources(ID2D1Factory* pDirect2dFactory,ID2D1HwndRenderTarget* pRenderTarget)
 {
+
 	HRESULT hr = pRenderTarget->CreateSolidColorBrush(
 		D2D1::ColorF(D2D1::ColorF::Red),
 		&m_pLightSlateGrayBrush
@@ -21,12 +22,15 @@ HRESULT hrDirectorApp::CreateResources(ID2D1HwndRenderTarget* pRenderTarget)
 	if (FAILED(hr))
 		return hr;
 
+	
+	hr = CreateGraticule(pDirect2dFactory, 100.0f);
+
 	return hr;
 }
 
 void hrDirectorApp::DiscardResources()
 {
-
+	SafeRelease(&m_pGraticule);
 	SafeRelease(&m_pLightSlateGrayBrush);
 	SafeRelease(&m_pCornflowerBlueBrush);
 }
@@ -42,19 +46,33 @@ void hrDirectorApp::Render(D2D1_SIZE_F rtSize, ID2D1HwndRenderTarget* pRenderTar
 
 	RenderGrid(rtSize, pRenderTarget);
 
+	int maxlen = (rtSize.width < rtSize.height) ? rtSize.width : rtSize.height;
+
+	D2D1::Matrix3x2F translationMatrixX = D2D1::Matrix3x2F::Translation(rtSize.width/2 , rtSize.height/2);
+	D2D1::Matrix3x2F scaleMatrixX = D2D1::Matrix3x2F::Scale(D2D1::SizeF((maxlen / 4)/100.0f, (maxlen / 4)/100.0f), D2D1::Point2F(0, 0));
+	pRenderTarget->SetTransform(scaleMatrixX * translationMatrixX);
+	//CreateGraticule(m_pDirect2dFactory, rtSize);
+	pRenderTarget->DrawGeometry(m_pGraticule, m_pCornflowerBlueBrush, 1.7f);
+	pRenderTarget->SetTransform(translationMatrixX);
+	pRenderTarget->DrawEllipse(D2D1::Ellipse(D2D1::Point2F(0, 0), maxlen / 4, maxlen / 4), m_pCornflowerBlueBrush);
+	pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
+
+
+
+
 	// Draw two rectangles.
 	D2D1_RECT_F rectangle1 = D2D1::RectF(
-		rtSize.width / 2 - m_sizeA,
-		rtSize.height / 2 - m_sizeA,
-		rtSize.width / 2 + m_sizeA,
-		rtSize.height / 2 + m_sizeA
+		maxlen / 2 - m_sizeA,
+		maxlen / 2 - m_sizeA,
+		maxlen / 2 + m_sizeA,
+		maxlen / 2 + m_sizeA
 	);
 
 	D2D1_RECT_F rectangle2 = D2D1::RectF(
-		rtSize.width / 2 - m_sizeB,
-		rtSize.height / 2 - m_sizeB,
-		rtSize.width / 2 + m_sizeB,
-		rtSize.height / 2 + m_sizeB
+		maxlen / 2 - m_sizeB,
+		maxlen / 2 - m_sizeB,
+		maxlen / 2 + m_sizeB,
+		maxlen / 2 + m_sizeB
 	);
 
 
@@ -91,5 +109,125 @@ void hrDirectorApp::RenderGrid(D2D1_SIZE_F rtSize, ID2D1HwndRenderTarget* pRende
 			0.5f
 		);
 	}
+
+}
+
+HRESULT hrDirectorApp::CreateGraticule(ID2D1Factory* pDirect2dFactory, float length)
+{
+	
+
+	ID2D1GeometrySink *pSink = NULL;
+	ID2D1PathGeometry* tempPath;
+	HRESULT hr = pDirect2dFactory->CreatePathGeometry(&m_pGraticule);
+	if (SUCCEEDED(hr))
+	{
+		hr = pDirect2dFactory->CreatePathGeometry(&tempPath);
+	}
+	if (SUCCEEDED(hr))
+	{
+		hr = tempPath->Open(&pSink);
+	}
+	if (SUCCEEDED(hr))
+	{
+		/* 2 degree divisions
+		for (double angle = 2.0; angle <= 360.0; angle += 2.0)
+		{
+		if (angle < 120.f || angle > 240.f)
+		{
+		if (fmod(angle, 10.0) != 0.0)
+		{
+
+		float x1 = 0, x2 = 0, y1 = 0, y2 = -150; //0 degrees at top
+		RotateLine(x1, y1, x2, y2, angle);
+		pSink->BeginFigure(D2D1::Point2F(x1, y1), D2D1_FIGURE_BEGIN_HOLLOW);
+		pSink->AddLine(D2D1::Point2F(x2, y2));
+		pSink->EndFigure(D2D1_FIGURE_END_OPEN);
+		}
+		}
+		}
+
+		for (double angle = 4.0; angle <= 360.0; angle += 4.0)
+		{
+		//if (angle < 120.f || angle > 240.f)
+		//{
+		if (fmod(angle, 40.0) != 0.0)
+		{
+
+		float x1 = 0, x2 = 0, y1 = 0, y2 = -150; //0 degrees at top
+		RotateLine(x1, y1, x2, y2, angle);
+		pSink->BeginFigure(D2D1::Point2F(x1, y1), D2D1_FIGURE_BEGIN_HOLLOW);
+		pSink->AddLine(D2D1::Point2F(x2, y2));
+		pSink->EndFigure(D2D1_FIGURE_END_OPEN);
+		}
+		//}
+		}*/
+
+		/* 3.6 degree */
+		for (double angle = 0; angle <= 360.0; angle += 3.6)
+		{
+			float x1 = 0, y1 = 0, x2 = 0,  y2 = length;
+			RotateLine(x1, y1, x2, y2, angle);
+			pSink->BeginFigure(D2D1::Point2F(x1, y1), D2D1_FIGURE_BEGIN_HOLLOW);
+			pSink->AddLine(D2D1::Point2F(x2, y2));
+			pSink->EndFigure(D2D1_FIGURE_END_OPEN);
+		}
+
+		hr = pSink->Close();
+		SafeRelease(&pSink);
+	}
+	ID2D1GeometrySink* pSinkClip;
+	if (SUCCEEDED(hr))
+	{
+		hr = m_pGraticule->Open(&pSinkClip);
+	}
+
+	D2D1_ELLIPSE clip;
+	ID2D1EllipseGeometry* clipEllipse;
+	if (SUCCEEDED(hr))
+	{
+		//Create a clip ellipse.
+		clip = D2D1::Ellipse(
+			D2D1::Point2F(0,0),
+			length - (length/8),
+			length - (length/8)
+		);
+		hr = pDirect2dFactory->CreateEllipseGeometry(&clip, &clipEllipse);
+	}
+	if (SUCCEEDED(hr))
+	{
+		//There's no direct support for clipping path in Direct2D. So we can intersect a path with its clip instead.
+		hr = tempPath->CombineWithGeometry(clipEllipse, D2D1_COMBINE_MODE_EXCLUDE /*D2D1_COMBINE_MODE_INTERSECT*/, NULL, 0, pSinkClip);
+	}
+	if (SUCCEEDED(hr))
+	{
+		hr = pSinkClip->Close();
+		SafeRelease(&pSinkClip);
+		SafeRelease(&tempPath);
+		SafeRelease(&clipEllipse);
+	}
+	return hr;
+}
+
+void hrDirectorApp::RotateLine(float& x1, float& y1, float& x2, float& y2, double deg)
+{
+	int r, c, k;
+	double rad, a[2][2], m[2][2], rot[2][2];
+	a[0][0] = x1;
+	a[0][1] = y1;
+	a[1][0] = x2;
+	a[1][1] = y2;
+	rad = (deg*(3.14159265358979323846)) / 180;
+	rot[0][0] = cos(rad);
+	rot[0][1] = sin(rad);
+	rot[1][0] = -sin(rad);
+	rot[1][1] = rot[0][0];  //cos(rad)
+	for (r = 0; r<2; r++)
+		for (c = 0; c<2; c++)
+		{
+			m[r][c] = 0;
+			for (k = 0; k<2; k++)
+				m[r][c] = m[r][c] + a[r][k] * rot[k][c];
+		}
+	x1 = (float)m[0][0], y1 = (float)m[0][1], x2 = (float)m[1][0], y2 = (float)m[1][1];
 
 }

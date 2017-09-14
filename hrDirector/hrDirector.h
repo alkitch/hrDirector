@@ -47,16 +47,25 @@ private:
 	static INT_PTR CALLBACK About(HWND, UINT, WPARAM, LPARAM);
 
 protected:
-	HRESULT CreateResources(ID2D1HwndRenderTarget* pRenderTarget);
+	HRESULT CreateResources(ID2D1Factory* pDirect2dFactory, ID2D1HwndRenderTarget* pRenderTarget);
 	void DiscardResources();
 	void Update(DIJOYSTATE2 js);
 	void Render(D2D1_SIZE_F size, ID2D1HwndRenderTarget* pRenderTarget);
 protected:
 	void RenderGrid(D2D1_SIZE_F rtSize, ID2D1HwndRenderTarget* pRenderTarget);
+
+protected:
+	ID2D1PathGeometry* m_pGraticule;
+	HRESULT CreateGraticule(ID2D1Factory* pDirect2dFactory, float length);
+protected:
+
+
+	void RotateLine(float& x1, float& y1, float& x2, float& y2, double deg);
 private:
 	HWND m_hwnd;
-	ID2D1Factory* m_pDirect2dFactory;
 	ID2D1HwndRenderTarget* m_pRenderTarget;
+	ID2D1Factory* m_pDirect2dFactory;
+	IDWriteFactory* m_pDWriteFactory;
 	ID2D1SolidColorBrush* m_pLightSlateGrayBrush;
 	ID2D1SolidColorBrush* m_pCornflowerBlueBrush;
 	CJoystickDevice m_joystick;

@@ -398,7 +398,7 @@ HRESULT hrDirectorApp::CreateDeviceResources()
 
 		if (SUCCEEDED(hr))
 		{
-			hr = CreateResources(m_pRenderTarget);
+			hr = CreateResources(m_pDirect2dFactory,m_pRenderTarget);
 		}
 
 	}
