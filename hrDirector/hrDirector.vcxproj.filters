@@ -44,6 +44,9 @@
     <ClCompile Include="joystick.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="hrDirectorGraphics.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="hrDirector.rc">

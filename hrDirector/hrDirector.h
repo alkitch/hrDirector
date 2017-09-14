@@ -46,6 +46,13 @@ private:
 
 	static INT_PTR CALLBACK About(HWND, UINT, WPARAM, LPARAM);
 
+protected:
+	HRESULT CreateResources(ID2D1HwndRenderTarget* pRenderTarget);
+	void DiscardResources();
+	void Update(DIJOYSTATE2 js);
+	void Render(D2D1_SIZE_F size, ID2D1HwndRenderTarget* pRenderTarget);
+protected:
+	void RenderGrid(D2D1_SIZE_F rtSize, ID2D1HwndRenderTarget* pRenderTarget);
 private:
 	HWND m_hwnd;
 	ID2D1Factory* m_pDirect2dFactory;

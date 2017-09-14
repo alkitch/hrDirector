@@ -34,9 +34,9 @@ hrDirectorApp::~hrDirectorApp()
 
 
 void hrDirectorApp::RunMessageLoop()
-{	
+{
 	HACCEL hAccelTable = LoadAccelerators(HINST_THISCOMPONENT, MAKEINTRESOURCE(IDC_HRDIRECTOR));
-MSG msg;
+	MSG msg;
 #ifdef NORUNTIME
 	MSG msg;
 
@@ -50,12 +50,12 @@ MSG msg;
 		}
 	}
 #else
-	
+
 	msg.message = 0;
 	int loops;
 	ULONGLONG next_game_tick = GetTickCount64();
 	m_bIsGameRunning = true;
-	while ( (msg.message) != WM_QUIT && m_bIsGameRunning == true )
+	while ((msg.message) != WM_QUIT && m_bIsGameRunning == true)
 	{
 		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
 		{
@@ -67,7 +67,7 @@ MSG msg;
 		}
 		else
 		{
-			
+
 			loops = 0;
 			while (GetTickCount64() > next_game_tick && loops < MAX_FRAMESKIP)
 			{
@@ -84,7 +84,7 @@ MSG msg;
 
 	//return ExitInstance((int)msg.wParam);
 #endif
-	
+
 }
 
 HRESULT hrDirectorApp::Initialize()
@@ -164,12 +164,12 @@ HRESULT hrDirectorApp::Initialize()
 
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-                     _In_opt_ HINSTANCE hPrevInstance,
-                     _In_ LPWSTR    lpCmdLine,
-                     _In_ int       nCmdShow)
+	_In_opt_ HINSTANCE hPrevInstance,
+	_In_ LPWSTR    lpCmdLine,
+	_In_ int       nCmdShow)
 {
-    UNREFERENCED_PARAMETER(hPrevInstance);
-    UNREFERENCED_PARAMETER(lpCmdLine);
+	UNREFERENCED_PARAMETER(hPrevInstance);
+	UNREFERENCED_PARAMETER(lpCmdLine);
 
 	hInst = hInstance;
 	// Use HeapSetInformation to specify that the process should
@@ -207,40 +207,40 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 /*
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    switch (message)
-    {
-    case WM_COMMAND:
-        {
-            int wmId = LOWORD(wParam);
-            // Parse the menu selections:
-            switch (wmId)
-            {
-            case IDM_ABOUT:
-                DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-                break;
-            case IDM_EXIT:
-                DestroyWindow(hWnd);
-                break;
-            default:
-                return DefWindowProc(hWnd, message, wParam, lParam);
-            }
-        }
-        break;
-    case WM_PAINT:
-        {
-            PAINTSTRUCT ps;
-            HDC hdc = BeginPaint(hWnd, &ps);
-            // TODO: Add any drawing code that uses hdc here...
-            EndPaint(hWnd, &ps);
-        }
-        break;
-    case WM_DESTROY:
-        PostQuitMessage(0);
-        break;
-    default:
-        return DefWindowProc(hWnd, message, wParam, lParam);
-    }
-    return 0;
+	switch (message)
+	{
+	case WM_COMMAND:
+		{
+			int wmId = LOWORD(wParam);
+			// Parse the menu selections:
+			switch (wmId)
+			{
+			case IDM_ABOUT:
+				DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+				break;
+			case IDM_EXIT:
+				DestroyWindow(hWnd);
+				break;
+			default:
+				return DefWindowProc(hWnd, message, wParam, lParam);
+			}
+		}
+		break;
+	case WM_PAINT:
+		{
+			PAINTSTRUCT ps;
+			HDC hdc = BeginPaint(hWnd, &ps);
+			// TODO: Add any drawing code that uses hdc here...
+			EndPaint(hWnd, &ps);
+		}
+		break;
+	case WM_DESTROY:
+		PostQuitMessage(0);
+		break;
+	default:
+		return DefWindowProc(hWnd, message, wParam, lParam);
+	}
+	return 0;
 }
 */
 LRESULT CALLBACK hrDirectorApp::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -341,21 +341,21 @@ LRESULT CALLBACK hrDirectorApp::WndProc(HWND hwnd, UINT message, WPARAM wParam, 
 // Message handler for about box.
 INT_PTR CALLBACK hrDirectorApp::About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    UNREFERENCED_PARAMETER(lParam);
-    switch (message)
-    {
-    case WM_INITDIALOG:
-        return (INT_PTR)TRUE;
+	UNREFERENCED_PARAMETER(lParam);
+	switch (message)
+	{
+	case WM_INITDIALOG:
+		return (INT_PTR)TRUE;
 
-    case WM_COMMAND:
-        if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
-        {
-            EndDialog(hDlg, LOWORD(wParam));
-            return (INT_PTR)TRUE;
-        }
-        break;
-    }
-    return (INT_PTR)FALSE;
+	case WM_COMMAND:
+		if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
+		{
+			EndDialog(hDlg, LOWORD(wParam));
+			return (INT_PTR)TRUE;
+		}
+		break;
+	}
+	return (INT_PTR)FALSE;
 }
 
 
@@ -363,7 +363,7 @@ INT_PTR CALLBACK hrDirectorApp::About(HWND hDlg, UINT message, WPARAM wParam, LP
 HRESULT hrDirectorApp::CreateDeviceIndependentResources()
 {
 	HRESULT hr = S_OK;
-	
+
 	// Create a Direct2D factory.
 	hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_pDirect2dFactory);
 
@@ -375,7 +375,7 @@ HRESULT hrDirectorApp::CreateDeviceIndependentResources()
 HRESULT hrDirectorApp::CreateDeviceResources()
 {
 	HRESULT hr = S_OK;
-	
+
 	if (!m_pRenderTarget)
 	{
 		RECT rc;
@@ -398,24 +398,15 @@ HRESULT hrDirectorApp::CreateDeviceResources()
 
 		if (SUCCEEDED(hr))
 		{
-			// Create a gray brush.
-			hr = m_pRenderTarget->CreateSolidColorBrush(
-				D2D1::ColorF(D2D1::ColorF::Red),
-				&m_pLightSlateGrayBrush
-			);
+			hr = CreateResources(m_pRenderTarget);
 		}
-		if (SUCCEEDED(hr))
-		{
-			// Create a blue brush.
-			hr = m_pRenderTarget->CreateSolidColorBrush(
-				D2D1::ColorF(D2D1::ColorF::CornflowerBlue),
-				&m_pCornflowerBlueBrush
-			);
-		}
+
 	}
 
 	return hr;
 }
+
+
 
 void hrDirectorApp::OnResize(UINT width, UINT height)
 {
@@ -431,42 +422,32 @@ void hrDirectorApp::OnResize(UINT width, UINT height)
 void hrDirectorApp::DiscardDeviceResources()
 {
 	SafeRelease(&m_pRenderTarget);
-	SafeRelease(&m_pLightSlateGrayBrush);
-	SafeRelease(&m_pCornflowerBlueBrush);
+	DiscardResources();
+
 }
+
+
 
 HRESULT hrDirectorApp::OnUpdate()
 {
+
+	
 	DIJOYSTATE2 js = { 0 };
 	if (m_bJoystickValid == true)
 	{
 		HRESULT hs = m_joystick.UpdateInputState(js);
 		if (hs == S_OK)
 		{
-			CString sz;
-			sz.Format(_T("%d,%d\n"), js.lX, js.lY);
-			OutputDebugString(sz);
 
-			m_sizeA = 100 + (js.lX * 0.5f);
-			m_sizeB = 100 + (js.lY * 0.5f);
-		}
-		else {
-			OutputDebugString(L"Update Fail\n");
+			//CString sz;
+			//sz.Format(_T("%d,%d\n"), js.lX, js.lY);
+			//OutputDebugString(sz);
+
+			Update(js);
 		}
 	}
 
-	HRESULT hr = S_OK;
-	
-	/*m_sizeA += 0.1f;
-	m_sizeB += 0.2f;
-	if (m_sizeA > 50)
-	{
-		m_sizeA = 1.0f;
-		m_sizeB = 1.0f;
-	}
-	*/
-
-	return hr;
+	return S_OK;
 }
 
 HRESULT hrDirectorApp::OnRender()
@@ -481,54 +462,10 @@ HRESULT hrDirectorApp::OnRender()
 
 		m_pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
 
-		m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::White));
+		m_pRenderTarget->Clear(D2D1::ColorF(D2D1::ColorF::Black));
 
-		D2D1_SIZE_F rtSize = m_pRenderTarget->GetSize();
+		Render(m_pRenderTarget->GetSize(), m_pRenderTarget);
 
-		// Draw a grid background.
-		int width = static_cast<int>(rtSize.width);
-		int height = static_cast<int>(rtSize.height);
-
-		for (int x = 0; x < width; x += 10)
-		{
-			m_pRenderTarget->DrawLine(
-				D2D1::Point2F(static_cast<FLOAT>(x), 0.0f),
-				D2D1::Point2F(static_cast<FLOAT>(x), rtSize.height),
-				m_pLightSlateGrayBrush,
-				0.5f
-			);
-		}
-
-		for (int y = 0; y < height; y += 10)
-		{
-			m_pRenderTarget->DrawLine(
-				D2D1::Point2F(0.0f, static_cast<FLOAT>(y)),
-				D2D1::Point2F(rtSize.width, static_cast<FLOAT>(y)),
-				m_pLightSlateGrayBrush,
-				0.5f
-			);
-		}
-
-		// Draw two rectangles.
-		D2D1_RECT_F rectangle1 = D2D1::RectF(
-			rtSize.width / 2 - m_sizeA,
-			rtSize.height / 2 - m_sizeA,
-			rtSize.width / 2 + m_sizeA,
-			rtSize.height / 2 + m_sizeA
-		);
-
-		D2D1_RECT_F rectangle2 = D2D1::RectF(
-			rtSize.width / 2 - m_sizeB,
-			rtSize.height / 2 - m_sizeB,
-			rtSize.width / 2 + m_sizeB,
-			rtSize.height / 2 + m_sizeB
-		);
-
-
-		m_pRenderTarget->FillRectangle(&rectangle1, m_pLightSlateGrayBrush);
-
-		// Draw the outline of a rectangle.
-		m_pRenderTarget->DrawRectangle(&rectangle2, m_pCornflowerBlueBrush);
 		hr = m_pRenderTarget->EndDraw();
 	}
 	if (hr == D2DERR_RECREATE_TARGET)
@@ -538,6 +475,10 @@ HRESULT hrDirectorApp::OnRender()
 	}
 
 	return hr;
+
 }
+
+
+
 
 
