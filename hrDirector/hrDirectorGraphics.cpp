@@ -42,7 +42,7 @@ HRESULT hrDirectorApp::CreateResources(ID2D1Factory* pDirect2dFactory, ID2D1Hwnd
 
 	
 	hr = pRenderTarget->CreateSolidColorBrush(
-		D2D1::ColorF(D2D1::ColorF::Green),
+		D2D1::ColorF(D2D1::ColorF::Magenta),
 		&m_pGreenBrush
 	);
 
@@ -51,7 +51,7 @@ HRESULT hrDirectorApp::CreateResources(ID2D1Factory* pDirect2dFactory, ID2D1Hwnd
 	
 
 	hr = pRenderTarget->CreateSolidColorBrush(
-		D2D1::ColorF(D2D1::ColorF::Yellow),
+		D2D1::ColorF(D2D1::ColorF::Orange),
 		&m_pYellowBrush
 	);
 
@@ -67,7 +67,7 @@ HRESULT hrDirectorApp::CreateResources(ID2D1Factory* pDirect2dFactory, ID2D1Hwnd
 		return hr;
 
 	hr = pRenderTarget->CreateSolidColorBrush(
-		D2D1::ColorF(D2D1::ColorF::Red),
+		D2D1::ColorF(D2D1::ColorF::OrangeRed),
 		&m_pRedBrush
 	);
 
@@ -110,11 +110,17 @@ void hrDirectorApp::Update(DIJOYSTATE2 js)
 	m_x += (ps.x);
 	m_y += -(ps.y);
 
+	#ifdef _DEBUG 
 	wchar_t buf[_MAX_PATH];
 	wsprintfW(buf, L"%i - %i\n", (int)m_x, (int)m_y);
 	OutputDebugString(buf);
+#endif 
 	float nSize = 30.0f;
-	m_bFlag = ( m_x < -30.0f ) || (m_x > 30.0f ) || (m_y < -30.0f) || (m_y > 30.0f ) ;
+	m_bFlag = (int)( ( m_x < -nSize) || (m_x > nSize) || (m_y < -nSize) || (m_y > nSize))?1:0;
+	if (m_bFlag) {
+		nSize += 30.0f;
+		m_bFlag = (int)((m_x < -nSize) || (m_x > nSize) || (m_y < -nSize) || (m_y > nSize)) ?2 : 1;
+	}
 
 }
 
@@ -186,7 +192,13 @@ void hrDirectorApp::Render(D2D1_SIZE_F rtSize, ID2D1HwndRenderTarget* pRenderTar
 
 
 	CreateBars(m_pDirect2dFactory, m_x, m_y);
-	pRenderTarget->DrawGeometry(m_pBars, (m_bFlag == true)?m_pRedBrush:m_pGreenBrush, 2.0F);
+	ID2D1SolidColorBrush** barColor = &m_pGreenBrush;
+	if (m_bFlag == 1)
+		barColor = &m_pYellowBrush;
+
+	if (m_bFlag == 2)
+		barColor = &m_pRedBrush;
+	pRenderTarget->DrawGeometry(m_pBars, *barColor, 2.0F);
 	SafeRelease(&m_pBars);
 
 	pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());

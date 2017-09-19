@@ -90,5 +90,5 @@ private:
 	CJoystickDevice m_joystick;
 	bool m_bJoystickValid;
 	bool m_bIsGameRunning;
-	bool m_bFlag;
+	int m_bFlag;
 };
