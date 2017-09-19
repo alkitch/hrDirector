@@ -66,6 +66,14 @@ HRESULT hrDirectorApp::CreateResources(ID2D1Factory* pDirect2dFactory, ID2D1Hwnd
 	if (FAILED(hr))
 		return hr;
 
+	hr = pRenderTarget->CreateSolidColorBrush(
+		D2D1::ColorF(D2D1::ColorF::Red),
+		&m_pRedBrush
+	);
+
+	if (FAILED(hr))
+		return hr;
+
 	hr = CreateGraticule(pDirect2dFactory, GraticuleRadius);
 
 	return hr;
@@ -82,13 +90,63 @@ void hrDirectorApp::DiscardResources()
 	SafeRelease(&m_pGreenBrush);
 	SafeRelease(&m_pYellowBrush);
 	SafeRelease(&m_pWhiteBrush);
+	SafeRelease(&m_pRedBrush);
 }
 
 void hrDirectorApp::Update(DIJOYSTATE2 js)
 {
-	m_sizeA = 100 + (js.lX * 0.5f);
-	m_sizeB = 100 + (js.lY * 0.5f);
+
+	long double x = sin(radian) + cos(halfradian);
+	long double y = cos(radian) + sin(halfradian);
+	radian += 0.0174532925 * 0.1;
+	halfradian += (0.0174532925 * 0.06 );
+
+	m_x = (float)(x*(GraticuleRadius / 2.0));
+	m_y = (float)(y*(GraticuleRadius / 2.0));
+
+	POINTF ps;
+
+	SmoothJoystick(js, ps);
+	m_x += (ps.x);
+	m_y += -(ps.y);
+
+	wchar_t buf[_MAX_PATH];
+	wsprintfW(buf, L"%i - %i\n", (int)m_x, (int)m_y);
+	OutputDebugString(buf);
+	float nSize = 30.0f;
+	m_bFlag = ( m_x < -30.0f ) || (m_x > 30.0f ) || (m_y < -30.0f) || (m_y > 30.0f ) ;
+
 }
+
+
+void hrDirectorApp::SmoothJoystick(DIJOYSTATE2 js, POINTF& ps)
+{
+	POINT accs = { 0 };
+
+	for (int i = 0; i < JOYSTICK_SMOOTH_SIZE; i++)
+	{
+		accs.x += m_joystickpt[i].x - (LONG)GraticuleRadius;
+		accs.y += m_joystickpt[i].y - (LONG)GraticuleRadius;
+	}
+	accs.x += js.lX;
+	accs.y += js.lY;
+
+	ps.x = (float)(accs.x / (JOYSTICK_SMOOTH_SIZE + 1));
+	ps.y = (float)(accs.y / (JOYSTICK_SMOOTH_SIZE + 1));
+
+	
+	//POINT m_joystickpt[[JOYSTICK_SMOOTH_SIZE];
+
+	for (int i = 1; i <= JOYSTICK_SMOOTH_SIZE; i++)
+	{
+		m_joystickpt[i-1].x = m_joystickpt[i].x;
+		m_joystickpt[i-1].y = m_joystickpt[i].y;
+
+	}
+	m_joystickpt[JOYSTICK_SMOOTH_SIZE-1].x = js.lX + GraticuleRadius;
+	m_joystickpt[JOYSTICK_SMOOTH_SIZE - 1].y = js.lY + GraticuleRadius;
+}
+
 
 void hrDirectorApp::Render(D2D1_SIZE_F rtSize, ID2D1HwndRenderTarget* pRenderTarget)
 {
@@ -104,48 +162,34 @@ void hrDirectorApp::Render(D2D1_SIZE_F rtSize, ID2D1HwndRenderTarget* pRenderTar
 	D2D1_ROUNDED_RECT rectF = D2D1::RoundedRect(D2D1::RectF(-GraticuleCase, GraticuleCase, GraticuleCase, -GraticuleCase), 8.0f, 8.0f);
 	pRenderTarget->FillRoundedRectangle(rectF, m_pDimGrayBrush);
 
-
-
-
-
-	//pRenderTarget->SetTransform(translationMatrixX);
 	pRenderTarget->FillEllipse(D2D1::Ellipse(D2D1::Point2F(0, 0), GraticuleRadius, GraticuleRadius), m_pBlackBrush); // maxlen / 2.0f, maxlen / 2.0f), m_pCornflowerBlueBrush);
 //	pRenderTarget->DrawGeometry(m_pGraticule, m_pCornflowerBlueBrush,0.4f);
 
 	pRenderTarget->DrawEllipse(D2D1::Ellipse(D2D1::Point2F(0, 0), GraticuleRadius, GraticuleRadius), m_pWhiteBrush); // maxlen / 2.0f, maxlen / 2.0f), m_pCornflowerBlueBrush);
+	pRenderTarget->FillEllipse(D2D1::Ellipse(D2D1::Point2F(0, 0), 2.0f, 2.0f), m_pWhiteBrush); // maxlen / 2.0f, maxlen / 2.0f), m_pCornflowerBlueBrush);
 
-	//pRenderTarget->DrawLine(D2D1::Point2F(-GraticuleCase, 0), D2D1::Point2F(GraticuleCase, 0), m_pCornflowerBlueBrush, 1.0F);
-	//pRenderTarget->DrawLine(D2D1::Point2F(0, -GraticuleCase), D2D1::Point2F(0, GraticuleCase), m_pCornflowerBlueBrush, 1.0F);
-	CreateBars(m_pDirect2dFactory);
-	pRenderTarget->DrawGeometry(m_pBars, m_pGreenBrush, 2.0F);
+	pRenderTarget->FillEllipse(D2D1::Ellipse(D2D1::Point2F(-10, 0), 2.0f, 2.0f), m_pWhiteBrush); // maxlen / 2.0f, maxlen / 2.0f), m_pCornflowerBlueBrush);
+	pRenderTarget->FillEllipse(D2D1::Ellipse(D2D1::Point2F(-20, 0), 2.0f, 2.0f), m_pWhiteBrush); // maxlen / 2.0f, maxlen / 2.0f), m_pCornflowerBlueBrush);
+	pRenderTarget->FillEllipse(D2D1::Ellipse(D2D1::Point2F(-30, 0), 2.0f, 2.0f), m_pWhiteBrush); // maxlen / 2.0f, maxlen / 2.0f), m_pCornflowerBlueBrush);
+
+	pRenderTarget->FillEllipse(D2D1::Ellipse(D2D1::Point2F(10, 0), 2.0f, 2.0f), m_pWhiteBrush); // maxlen / 2.0f, maxlen / 2.0f), m_pCornflowerBlueBrush);
+	pRenderTarget->FillEllipse(D2D1::Ellipse(D2D1::Point2F(20, 0), 2.0f, 2.0f), m_pWhiteBrush); // maxlen / 2.0f, maxlen / 2.0f), m_pCornflowerBlueBrush);
+	pRenderTarget->FillEllipse(D2D1::Ellipse(D2D1::Point2F(30, 0), 2.0f, 2.0f), m_pWhiteBrush); // maxlen / 2.0f, maxlen / 2.0f), m_pCornflowerBlueBrush);
+
+	pRenderTarget->FillEllipse(D2D1::Ellipse(D2D1::Point2F(0,-10), 2.0f, 2.0f), m_pWhiteBrush); // maxlen / 2.0f, maxlen / 2.0f), m_pCornflowerBlueBrush);
+	pRenderTarget->FillEllipse(D2D1::Ellipse(D2D1::Point2F(0,-20), 2.0f, 2.0f), m_pWhiteBrush); // maxlen / 2.0f, maxlen / 2.0f), m_pCornflowerBlueBrush);
+	pRenderTarget->FillEllipse(D2D1::Ellipse(D2D1::Point2F(0,-30 ), 2.0f, 2.0f), m_pWhiteBrush); // maxlen / 2.0f, maxlen / 2.0f), m_pCornflowerBlueBrush);
+
+	pRenderTarget->FillEllipse(D2D1::Ellipse(D2D1::Point2F(0,10), 2.0f, 2.0f), m_pWhiteBrush); // maxlen / 2.0f, maxlen / 2.0f), m_pCornflowerBlueBrush);
+	pRenderTarget->FillEllipse(D2D1::Ellipse(D2D1::Point2F(0,20), 2.0f, 2.0f), m_pWhiteBrush); // maxlen / 2.0f, maxlen / 2.0f), m_pCornflowerBlueBrush);
+	pRenderTarget->FillEllipse(D2D1::Ellipse(D2D1::Point2F(0,30), 2.0f, 2.0f), m_pWhiteBrush); // maxlen / 2.0f, maxlen / 2.0f), m_pCornflowerBlueBrush);
+
+
+	CreateBars(m_pDirect2dFactory, m_x, m_y);
+	pRenderTarget->DrawGeometry(m_pBars, (m_bFlag == true)?m_pRedBrush:m_pGreenBrush, 2.0F);
 	SafeRelease(&m_pBars);
 
 	pRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
-
-
-
-
-	/* Draw two rectangles.
-	D2D1_RECT_F rectangle1 = D2D1::RectF(
-		maxlen / 2 - m_sizeA,
-		maxlen / 2 - m_sizeA,
-		maxlen / 2 + m_sizeA,
-		maxlen / 2 + m_sizeA
-	);
-
-	D2D1_RECT_F rectangle2 = D2D1::RectF(
-		maxlen / 2 - m_sizeB,
-		maxlen / 2 - m_sizeB,
-		maxlen / 2 + m_sizeB,
-		maxlen / 2 + m_sizeB
-	);
-
-
-	pRenderTarget->FillRectangle(&rectangle1, m_pLightSlateGrayBrush);
-
-	// Draw the outline of a rectangle.
-	pRenderTarget->DrawRectangle(&rectangle2, m_pCornflowerBlueBrush);
-	*/
 
 }
 
@@ -179,7 +223,7 @@ void hrDirectorApp::RenderGrid(D2D1_SIZE_F rtSize, ID2D1HwndRenderTarget* pRende
 }
 
 
-HRESULT hrDirectorApp::CreateBars(ID2D1Factory* pDirect2dFactory)
+HRESULT hrDirectorApp::CreateBars(ID2D1Factory* pDirect2dFactory, float x, float y)
 {
 	ID2D1GeometrySink *pSink = NULL;
 	ID2D1PathGeometry* tempPath;
@@ -194,12 +238,12 @@ HRESULT hrDirectorApp::CreateBars(ID2D1Factory* pDirect2dFactory)
 	}
 	if (SUCCEEDED(hr))
 	{
-			pSink->BeginFigure(D2D1::Point2F(-GraticuleCase,100), D2D1_FIGURE_BEGIN_HOLLOW);
-			pSink->AddLine(D2D1::Point2F(GraticuleCase, 100));
+			pSink->BeginFigure(D2D1::Point2F(-GraticuleCase,y), D2D1_FIGURE_BEGIN_HOLLOW);
+			pSink->AddLine(D2D1::Point2F(GraticuleCase, y));
 			pSink->EndFigure(D2D1_FIGURE_END_OPEN);
 
-			pSink->BeginFigure(D2D1::Point2F(0,-GraticuleCase), D2D1_FIGURE_BEGIN_HOLLOW);
-			pSink->AddLine(D2D1::Point2F(0,GraticuleCase));
+			pSink->BeginFigure(D2D1::Point2F(x,-GraticuleCase), D2D1_FIGURE_BEGIN_HOLLOW);
+			pSink->AddLine(D2D1::Point2F(x,GraticuleCase));
 			pSink->EndFigure(D2D1_FIGURE_END_OPEN);
 
 		hr = pSink->Close();

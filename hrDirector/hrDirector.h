@@ -3,11 +3,13 @@
 #include "resource.h"
 class CJoystickDevice;
 
+#define JOYSTICK_SMOOTH_SIZE 5
+
 class hrDirectorApp
 {
 public:
-	const float GraticuleCase = 198.0f;
-	const float GraticuleRadius = 190.0f;
+	static const float GraticuleCase;
+	static const float GraticuleRadius;
 public:
 	hrDirectorApp();
 	~hrDirectorApp();
@@ -27,8 +29,10 @@ private:
 
 	// Release device-dependent resource.
 	void DiscardDeviceResources();
-	float m_sizeA;
-	float m_sizeB;
+	float m_x;
+	float m_y;
+	double radian;
+	double halfradian;
 	// Draw content.
 	HRESULT OnRender();
 	HRESULT OnUpdate();
@@ -50,7 +54,7 @@ private:
 	static INT_PTR CALLBACK About(HWND, UINT, WPARAM, LPARAM);
 
 protected:
-	HRESULT CreateBars(ID2D1Factory* pDirect2dFactoryh);
+	HRESULT CreateBars(ID2D1Factory* pDirect2dFactoryh, float x, float y);
 	HRESULT CreateResources(ID2D1Factory* pDirect2dFactory, ID2D1HwndRenderTarget* pRenderTarget);
 	void DiscardResources();
 	void Update(DIJOYSTATE2 js);
@@ -79,10 +83,12 @@ private:
 	ID2D1SolidColorBrush* m_pGreenBrush;
 	ID2D1SolidColorBrush* m_pYellowBrush;
 	ID2D1SolidColorBrush* m_pWhiteBrush;
+	ID2D1SolidColorBrush* m_pRedBrush;
 
-
-
+	void SmoothJoystick(DIJOYSTATE2 js, POINTF& ps);
+	POINT m_joystickpt[JOYSTICK_SMOOTH_SIZE];
 	CJoystickDevice m_joystick;
 	bool m_bJoystickValid;
 	bool m_bIsGameRunning;
+	bool m_bFlag;
 };

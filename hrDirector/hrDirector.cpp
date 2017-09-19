@@ -12,6 +12,10 @@ const int MAX_FRAMESKIP = 10;
 
 HINSTANCE hInst;
 
+const float hrDirectorApp::GraticuleCase = 198.0f;
+const float hrDirectorApp::GraticuleRadius = 190.0f;
+
+
 hrDirectorApp::hrDirectorApp() :
 	m_hwnd(nullptr),
 	m_pDirect2dFactory(nullptr),
@@ -21,6 +25,15 @@ hrDirectorApp::hrDirectorApp() :
 {
 	m_bJoystickValid = false;
 	m_bIsGameRunning = false;
+	m_x = 0.0f;
+	m_y = 0.0f;
+	radian = 0;
+	halfradian = 0;
+	m_joystickpt[0] = { 0 };
+	m_joystickpt[1] = { 0 };
+	m_joystickpt[2] = { 0 };
+	m_joystickpt[3] = { 0 };
+	m_joystickpt[4] = { 0 };
 }
 
 hrDirectorApp::~hrDirectorApp()
@@ -111,7 +124,7 @@ HRESULT hrDirectorApp::Initialize()
 		wcex.hIcon = LoadIcon(HINST_THISCOMPONENT, MAKEINTRESOURCE(IDI_HRDIRECTOR));
 		wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
 		wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-		wcex.lpszMenuName = MAKEINTRESOURCEW(IDC_HRDIRECTOR);
+		wcex.lpszMenuName = NULL; // MAKEINTRESOURCEW(IDC_HRDIRECTOR);
 		wcex.lpszClassName = szWindowClass;
 		wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
@@ -386,8 +399,6 @@ HRESULT hrDirectorApp::CreateDeviceResources()
 			rc.bottom - rc.top
 		);
 
-		m_sizeA = 1.0f;
-		m_sizeB = 1.0f;
 		// Create a Direct2D render target.
 		hr = m_pDirect2dFactory->CreateHwndRenderTarget(
 			D2D1::RenderTargetProperties(),
@@ -445,6 +456,8 @@ HRESULT hrDirectorApp::OnUpdate()
 
 			Update(js);
 		}
+
+		
 	}
 
 	return S_OK;

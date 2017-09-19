@@ -9,6 +9,7 @@
 
 #include "stdafx.h"
 #include "joystick.h"
+#include "hrDirector.h"
 
 #pragma warning(disable: 4996)
 
@@ -203,8 +204,8 @@ BOOL CALLBACK CJoystickDevice::EnumObjectsCallback(const DIDEVICEOBJECTINSTANCE*
 		diprg.diph.dwHeaderSize = sizeof(DIPROPHEADER);
 		diprg.diph.dwHow = DIPH_BYID;
 		diprg.diph.dwObj = pdidoi->dwType; // Specify the enumerated axis 
-		diprg.lMin = -1000;
-		diprg.lMax = +1000;
+		diprg.lMin = (long)-(hrDirectorApp::GraticuleRadius);
+		diprg.lMax = (long)(hrDirectorApp::GraticuleRadius);
 
 		// Set the range for the axis 
 		if (FAILED(g_pJoystick->SetProperty(DIPROP_RANGE, &diprg.diph)))
