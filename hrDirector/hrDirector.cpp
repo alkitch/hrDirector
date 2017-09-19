@@ -410,7 +410,7 @@ HRESULT hrDirectorApp::CreateDeviceResources()
 
 void hrDirectorApp::OnResize(UINT width, UINT height)
 {
-	if (m_pRenderTarget)
+	if ( m_pRenderTarget != NULL)
 	{
 		// Note: This method can fail, but it's okay to ignore the
 		// error here, because the error will be returned again

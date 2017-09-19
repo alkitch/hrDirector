@@ -6,6 +6,9 @@ class CJoystickDevice;
 class hrDirectorApp
 {
 public:
+	const float GraticuleCase = 198.0f;
+	const float GraticuleRadius = 190.0f;
+public:
 	hrDirectorApp();
 	~hrDirectorApp();
 
@@ -47,6 +50,7 @@ private:
 	static INT_PTR CALLBACK About(HWND, UINT, WPARAM, LPARAM);
 
 protected:
+	HRESULT CreateBars(ID2D1Factory* pDirect2dFactoryh);
 	HRESULT CreateResources(ID2D1Factory* pDirect2dFactory, ID2D1HwndRenderTarget* pRenderTarget);
 	void DiscardResources();
 	void Update(DIJOYSTATE2 js);
@@ -56,6 +60,7 @@ protected:
 
 protected:
 	ID2D1PathGeometry* m_pGraticule;
+	ID2D1PathGeometry* m_pBars;
 	HRESULT CreateGraticule(ID2D1Factory* pDirect2dFactory, float length);
 protected:
 
@@ -65,9 +70,18 @@ private:
 	HWND m_hwnd;
 	ID2D1HwndRenderTarget* m_pRenderTarget;
 	ID2D1Factory* m_pDirect2dFactory;
+	
 	IDWriteFactory* m_pDWriteFactory;
 	ID2D1SolidColorBrush* m_pLightSlateGrayBrush;
 	ID2D1SolidColorBrush* m_pCornflowerBlueBrush;
+	ID2D1SolidColorBrush* m_pDimGrayBrush;
+	ID2D1SolidColorBrush* m_pBlackBrush;
+	ID2D1SolidColorBrush* m_pGreenBrush;
+	ID2D1SolidColorBrush* m_pYellowBrush;
+	ID2D1SolidColorBrush* m_pWhiteBrush;
+
+
+
 	CJoystickDevice m_joystick;
 	bool m_bJoystickValid;
 	bool m_bIsGameRunning;
