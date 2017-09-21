@@ -3,7 +3,7 @@
 #include "resource.h"
 class CJoystickDevice;
 
-#define JOYSTICK_SMOOTH_SIZE 5
+#define JOYSTICK_SMOOTH_SIZE 10
 
 class hrDirectorApp
 {
