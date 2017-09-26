@@ -149,8 +149,8 @@ void hrDirectorApp::SmoothJoystick(DIJOYSTATE2 js, POINTF& ps)
 		m_joystickpt[i-1].y = m_joystickpt[i].y;
 
 	}
-	m_joystickpt[JOYSTICK_SMOOTH_SIZE-1].x = js.lX + GraticuleRadius;
-	m_joystickpt[JOYSTICK_SMOOTH_SIZE - 1].y = js.lY + GraticuleRadius;
+	m_joystickpt[JOYSTICK_SMOOTH_SIZE-1].x = js.lX + (long)GraticuleRadius;
+	m_joystickpt[JOYSTICK_SMOOTH_SIZE - 1].y = js.lY + (long)GraticuleRadius;
 }
 
 
