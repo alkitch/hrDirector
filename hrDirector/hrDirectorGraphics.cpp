@@ -98,8 +98,12 @@ void hrDirectorApp::Update(DIJOYSTATE2 js)
 
 	long double x = sin(radian) + cos(halfradian);
 	long double y = cos(radian) + sin(halfradian);
-	radian += 0.0174532925 * 0.1;
-	halfradian += (0.0174532925 * 0.06 );
+	radian += 0.0174532925 * 0.5;
+	halfradian += (0.0174532925 * 0.1 );
+
+	//radian += 0.0174532925 * 0.1;
+	//halfradian += (0.0174532925 * 0.06);
+
 
 	m_x = (float)(x*(GraticuleRadius / 2.0));
 	m_y = (float)(y*(GraticuleRadius / 2.0));
